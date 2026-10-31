@@ -32,7 +32,9 @@ bun run dev
 ```
 src/
   domain/match.ts        tipos (Match, LiveMatch) e cálculo da série
-  storage/matches.ts     persistência (localStorage) + backup em JSON
+  storage/store.ts       escolhe onde salvar (online no claude.ai ou localStorage)
+  storage/cloud.ts       banco online da página no claude.ai
+  storage/matches.ts     localStorage, backup em JSON e leitura dos dados salvos
   hooks/useScoreboard.ts estado e ações do placar
   hooks/useSkin.ts       liga/desliga o modo 8-bit
   lib/blip.ts            bipes 8-bit (Web Audio)
@@ -40,10 +42,22 @@ src/
   App.tsx
 ```
 
-## Dados
+## Onde os dados ficam
 
-Os dados ficam no `localStorage` do navegador onde o placar é usado. Use **Exportar backup**
-para guardar um JSON e **Importar backup** para restaurar em outro aparelho.
+- **Rodando local (`bun run dev`) ou em qualquer site:** no `localStorage` do navegador. Use
+  **Exportar backup** / **Importar backup** para levar o histórico para outro aparelho.
+- **Publicado no claude.ai:** no banco online da página, então o placar é o mesmo em qualquer
+  aparelho. O backup some nesse modo porque não é necessário.
 
-Para sincronizar entre aparelhos no futuro, basta trocar a implementação de
-`src/storage/matches.ts` por um backend (ex.: Supabase) — o resto do app não muda.
+O app escolhe sozinho (`src/storage/store.ts`): se `window.claude` existir, usa o banco online
+(`src/storage/cloud.ts`); senão, o `localStorage` (`src/storage/matches.ts`).
+
+## Publicar no claude.ai
+
+```sh
+bun run build:artifact
+```
+
+Gera `dist-artifact/resenha-fc.html` (build num arquivo só, no formato de página do claude.ai).
+É esse arquivo que vai para https://claude.ai/artifact/Jrt8dXbjWafZjEDhowBvWG — o GitHub é a
+fonte, a página é só o resultado do build.

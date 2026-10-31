@@ -1,10 +1,7 @@
 import type { LiveMatch, Match } from "../domain/match";
 import { emptyLiveMatch } from "../domain/match";
 
-/**
- * Persistência no navegador (localStorage). Toda leitura/escrita passa por aqui,
- * então trocar para um backend (ex.: Supabase) depois mexe só neste arquivo.
- */
+/** Persistência no navegador (localStorage), backup em JSON e leitura tolerante dos dados salvos. */
 
 const KEY = "resenha-fc:v1";
 /** Chave usada quando o app se chamava "placar-fifa"; lida uma vez para não perder partidas. */
@@ -65,12 +62,12 @@ function parseState(json: unknown): StoredState {
   return { live, matches };
 }
 
-function parseLive(v: unknown): LiveMatch {
+export function parseLive(v: unknown): LiveMatch {
   if (!isRecord(v)) return emptyLiveMatch();
   return { score: parseScore(v["score"]), clubs: parseClubs(v["clubs"]) };
 }
 
-function parseMatch(v: unknown): Match[] {
+export function parseMatch(v: unknown): Match[] {
   if (!isRecord(v) || typeof v["id"] !== "string" || typeof v["playedAt"] !== "string") return [];
   return [
     {

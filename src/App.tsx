@@ -6,6 +6,18 @@ import { useScoreboard } from "./hooks/useScoreboard";
 import { useSkin } from "./hooks/useSkin";
 import { blip } from "./lib/blip";
 import { exportBackup, parseBackup } from "./storage/matches";
+import type { StoreStatus } from "./storage/store";
+
+const STATUS: Record<StoreStatus, { text: string; warn?: boolean }> = {
+  loading: { text: "Conectando…" },
+  synced: { text: "Sincronizado online" },
+  offline: { text: "Sem conexão com o placar salvo", warn: true },
+  error: { text: "Não deu para salvar. Tente de novo.", warn: true },
+  readonly: { text: "Você só pode ver este placar", warn: true },
+  full: { text: "Limite de partidas atingido. Apague algumas antigas.", warn: true },
+  local: { text: "Salvo neste aparelho" },
+  "local-failed": { text: "Não foi possível salvar neste navegador", warn: true },
+};
 
 export function App() {
   const board = useScoreboard();
@@ -43,11 +55,10 @@ export function App() {
               Resenha FC · Felipe x Kauã
             </span>
             <span
-              className={`font-label text-[12px] ${board.saveFailed ? "text-kaua" : "text-muted"}`}
+              role="status"
+              className={`font-label text-[12px] ${STATUS[board.status].warn ? "text-kaua" : "text-muted"}`}
             >
-              {board.saveFailed
-                ? "Não foi possível salvar neste navegador"
-                : "Salvo neste aparelho"}
+              {STATUS[board.status].text}
             </span>
           </div>
           <button
@@ -87,31 +98,33 @@ export function App() {
 
         <MatchHistory matches={state.matches} onDelete={board.deleteMatch} />
 
-        <footer className="ui-footer flex flex-wrap items-center gap-3 text-sm text-muted">
-          <button type="button" onClick={downloadBackup} className="underline underline-offset-4">
-            Exportar backup
-          </button>
-          <button
-            type="button"
-            onClick={() => fileInput.current?.click()}
-            className="underline underline-offset-4"
-          >
-            Importar backup
-          </button>
-          <input
-            ref={fileInput}
-            id="backup-file"
-            type="file"
-            accept="application/json"
-            hidden
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) void importBackup(file);
-              e.target.value = "";
-            }}
-          />
-          {notice && <span role="status">{notice}</span>}
-        </footer>
+        {board.kind === "local" && (
+          <footer className="ui-footer flex flex-wrap items-center gap-3 text-sm text-muted">
+            <button type="button" onClick={downloadBackup} className="underline underline-offset-4">
+              Exportar backup
+            </button>
+            <button
+              type="button"
+              onClick={() => fileInput.current?.click()}
+              className="underline underline-offset-4"
+            >
+              Importar backup
+            </button>
+            <input
+              ref={fileInput}
+              id="backup-file"
+              type="file"
+              accept="application/json"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void importBackup(file);
+                e.target.value = "";
+              }}
+            />
+            {notice && <span role="status">{notice}</span>}
+          </footer>
+        )}
       </main>
     </div>
   );
