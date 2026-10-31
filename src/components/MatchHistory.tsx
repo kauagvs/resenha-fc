@@ -29,7 +29,7 @@ export function MatchHistory({ matches, onDelete }: Props) {
   return (
     <section>
       <Heading>Partidas</Heading>
-      <div className="flex flex-col divide-y divide-line overflow-hidden rounded-xl border border-line bg-turf">
+      <div className="ui-panel flex flex-col divide-y divide-line overflow-hidden rounded-xl border border-line bg-turf">
         {rows.length === 0 && (
           <p className="px-4 py-6 text-center text-muted">
             Nenhuma partida registrada ainda. Marque os gols e toque em “Encerrar partida”.
@@ -53,7 +53,7 @@ export function MatchHistory({ matches, onDelete }: Props) {
                   <span className="text-kaua">{match.score.kaua}</span>
                 </span>
                 <span
-                  className={`${pill.className} rounded-full border border-current px-2 py-0.5 font-label text-xs tracking-wider uppercase`}
+                  className={`${pill.className} ui-pill rounded-full border border-current px-2 py-0.5 font-label text-xs tracking-wider uppercase`}
                 >
                   {pill.label}
                 </span>
@@ -67,7 +67,7 @@ export function MatchHistory({ matches, onDelete }: Props) {
                 confirmLabel="Confirmar"
                 ariaLabel={`Apagar partida ${number}`}
                 onConfirm={() => onDelete(match.id)}
-                className="rounded-lg border border-transparent px-2.5 py-1.5 font-label text-[13px] tracking-wide text-muted uppercase hover:border-line"
+                className="ui-btn-text rounded-lg border border-transparent px-2.5 py-1.5 font-label text-[13px] tracking-wide text-muted uppercase hover:border-line"
               />
             </div>
           );

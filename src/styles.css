@@ -68,3 +68,206 @@ button {
     transition: none !important;
   }
 }
+
+/* ------------------------------------------------------------------
+   Modo 8-bit: liga com <html data-skin="pixel">.
+   Aparelho portátil retrô: chassi ciano, tela azul de mapa, botões de
+   console com cantos em degrau e sombra sólida, fonte bitmap, visor LCD.
+   ------------------------------------------------------------------ */
+:root[data-skin="pixel"] {
+  --color-night: #14123a; /* tinta dos contornos */
+  --color-turf: #22389c;
+  --color-line: #4766d1;
+  --color-chalk: #fff3dc;
+  --color-muted: #b3c8ff;
+  --color-felipe: #5ee08a;
+  --color-kaua: #ff8a6b;
+  --color-draw: #ffd38a;
+  --color-danger: #ff5a5a;
+
+  --px-ink: #14123a;
+  --px-shell: #4fb0ea;
+  --px-shell-dark: #2f86c4;
+  --px-lcd: #0d3b2c;
+  --px-lcd-text: #7dff9a;
+
+  --font-display: "Press Start 2P", "Courier New", monospace;
+  --font-label: "Press Start 2P", "Courier New", monospace;
+  --font-body: "Pixelify Sans", "Courier New", monospace;
+}
+
+/* Borda com cantos em degrau (sem border-radius), em 3 px. */
+[data-skin="pixel"] .ui-panel,
+[data-skin="pixel"] .ui-btn,
+[data-skin="pixel"] .ui-lcd,
+[data-skin="pixel"] .ui-toggle,
+[data-skin="pixel"] .ui-pill,
+[data-skin="pixel"] .ui-bar,
+[data-skin="pixel"] .ui-device {
+  --b: 3px;
+  border: 0;
+  border-radius: 0;
+  box-shadow:
+    0 calc(var(--b) * -1) 0 0 var(--px-ink),
+    0 var(--b) 0 0 var(--px-ink),
+    calc(var(--b) * -1) 0 0 0 var(--px-ink),
+    var(--b) 0 0 0 var(--px-ink);
+}
+
+[data-skin="pixel"] body {
+  font-family: var(--font-body);
+  background:
+    radial-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px) 0 0 / 4px 4px,
+    #1b1a26;
+  image-rendering: pixelated;
+}
+
+/* Chassi do aparelho */
+[data-skin="pixel"] .ui-device {
+  --b: 4px;
+  padding: 18px 14px 22px;
+  margin-top: 4px;
+  background: var(--px-shell);
+  box-shadow:
+    0 calc(var(--b) * -1) 0 0 var(--px-ink),
+    0 var(--b) 0 0 var(--px-ink),
+    calc(var(--b) * -1) 0 0 0 var(--px-ink),
+    var(--b) 0 0 0 var(--px-ink),
+    inset -6px -6px 0 0 var(--px-shell-dark),
+    inset 6px 6px 0 0 rgb(255 255 255 / 0.35);
+}
+[data-skin="pixel"] .ui-device > header .font-label,
+[data-skin="pixel"] .ui-heading,
+[data-skin="pixel"] .ui-footer {
+  color: var(--px-ink);
+}
+
+/* Fonte bitmap é larga: textos de rótulo menores e sem espaçamento extra. */
+[data-skin="pixel"] .font-label {
+  font-size: 10px;
+  letter-spacing: 0;
+  line-height: 1.6;
+  font-weight: 400;
+}
+[data-skin="pixel"] .ui-heading {
+  font-size: 11px;
+}
+
+/* Tela do placar: mapa azul com grade */
+[data-skin="pixel"] .ui-board {
+  background-color: #1d2f8f;
+  background-image:
+    linear-gradient(rgb(140 180 255 / 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(140 180 255 / 0.14) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+[data-skin="pixel"] .ui-lcd {
+  width: fit-content;
+  margin-inline: auto;
+  margin-bottom: 18px;
+  padding: 6px 10px;
+  background: var(--px-lcd);
+  color: var(--px-lcd-text);
+  text-shadow: 0 0 6px rgb(125 255 154 / 0.6);
+}
+[data-skin="pixel"] .ui-name {
+  font-size: clamp(12px, 3.6vw, 18px);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-shadow: 3px 3px 0 var(--px-ink);
+}
+[data-skin="pixel"] .ui-score {
+  font-size: clamp(52px, 16vw, 104px);
+  font-weight: 400;
+  line-height: 1;
+  padding-block: 6px;
+  text-shadow: 6px 6px 0 var(--px-ink);
+  animation: bump 0.3s steps(3);
+}
+[data-skin="pixel"] .ui-vs {
+  font-size: 22px;
+  color: var(--color-draw);
+  padding-bottom: 72px;
+}
+[data-skin="pixel"] .ui-input {
+  border-radius: 0;
+  background: rgb(0 0 0 / 0.25);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-chalk);
+}
+
+/* Botões de console */
+[data-skin="pixel"] .ui-btn {
+  font-size: 11px;
+  padding: 12px 14px;
+  color: var(--px-ink);
+  box-shadow:
+    0 calc(var(--b) * -1) 0 0 var(--px-ink),
+    0 var(--b) 0 0 var(--px-ink),
+    calc(var(--b) * -1) 0 0 0 var(--px-ink),
+    var(--b) 0 0 0 var(--px-ink),
+    inset -4px -4px 0 0 rgb(0 0 0 / 0.25),
+    inset 4px 4px 0 0 rgb(255 255 255 / 0.35);
+}
+[data-skin="pixel"] .ui-btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow:
+    0 calc(var(--b) * -1) 0 0 var(--px-ink),
+    0 var(--b) 0 0 var(--px-ink),
+    calc(var(--b) * -1) 0 0 0 var(--px-ink),
+    var(--b) 0 0 0 var(--px-ink),
+    inset 4px 4px 0 0 rgb(0 0 0 / 0.25);
+}
+[data-skin="pixel"] .ui-btn-ghost {
+  background: var(--color-draw);
+}
+[data-skin="pixel"] .ui-btn-sq {
+  font-family: var(--font-display);
+  font-size: 14px;
+  padding: 0;
+}
+
+/* Série e histórico */
+[data-skin="pixel"] .ui-tally-n {
+  font-size: 30px;
+  font-weight: 400;
+  padding-block: 4px;
+  text-shadow: 3px 3px 0 var(--px-ink);
+}
+[data-skin="pixel"] .ui-bar {
+  height: 10px;
+}
+[data-skin="pixel"] .ui-pill {
+  --b: 2px;
+  border: 0;
+  padding: 3px 6px;
+  font-size: 8px;
+}
+[data-skin="pixel"] .ui-facts,
+[data-skin="pixel"] .ui-facts b {
+  color: var(--px-ink);
+}
+[data-skin="pixel"] .ui-btn-text {
+  font-size: 9px;
+  border-radius: 0;
+}
+[data-skin="pixel"] .ui-footer button {
+  text-decoration-style: dotted;
+}
+
+/* Interruptor 8-BIT */
+[data-skin="pixel"] .ui-toggle {
+  background: var(--color-draw);
+  color: var(--px-ink);
+  padding: 8px 10px;
+}
+[data-skin="pixel"] .ui-toggle-track {
+  border-radius: 0;
+  background: var(--px-ink);
+}
+[data-skin="pixel"] .ui-toggle-knob {
+  border-radius: 0;
+  background: var(--color-felipe);
+  transition: transform 0.15s steps(2);
+}

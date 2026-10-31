@@ -5,6 +5,13 @@ série acumulada (vitórias, empates, gols, maior goleada, sequência) e histór
 
 Projeto pessoal, feito por diversão.
 
+## Modo 8-bit
+
+O botão **8-BIT** no topo troca o visual para um aparelho portátil retrô: fonte bitmap, botões
+de console com cantos em degrau, visor LCD e bipes de onda quadrada nos gols e no apito final.
+A escolha fica salva no navegador. O visual inteiro está em `src/styles.css`, na seção
+`[data-skin="pixel"]`; os componentes só recebem classes `ui-*` como ganchos.
+
 ## Stack
 
 - React 19 + TypeScript
@@ -27,6 +34,8 @@ src/
   domain/match.ts        tipos (Match, LiveMatch) e cálculo da série
   storage/matches.ts     persistência (localStorage) + backup em JSON
   hooks/useScoreboard.ts estado e ações do placar
+  hooks/useSkin.ts       liga/desliga o modo 8-bit
+  lib/blip.ts            bipes 8-bit (Web Audio)
   components/            Scoreboard, SeriesSummary, MatchHistory, ConfirmButton
   App.tsx
 ```

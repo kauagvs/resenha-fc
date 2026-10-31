@@ -9,8 +9,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&family=Pixelify+Sans:wght@400;600&family=Press+Start+2P&display=swap"
     />
+    <script>
+      try {
+        if (localStorage.getItem("resenha-fc:skin") === "pixel")
+          document.documentElement.dataset.skin = "pixel";
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
