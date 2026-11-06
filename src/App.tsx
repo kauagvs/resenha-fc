@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MatchHistory } from "@/components/MatchHistory";
-import { Gamepad2, Volume2, VolumeX } from "lucide-react";
+import { Gamepad2, Maximize, Volume2, VolumeX } from "lucide-react";
 import { GoalFlash } from "@/components/GoalFlash";
 import { Scoreboard } from "@/components/Scoreboard";
 import { SeriesSummary } from "@/components/SeriesSummary";
 import { Switch } from "@/components/Switch";
 import { TodayPanel } from "@/components/TodayPanel";
+import { TvScoreboard } from "@/components/TvScoreboard";
 import type { Player } from "@/domain/match";
 import { dayKeyOf, groupByDay, outcomeOf, quitadaOf } from "@/domain/match";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useScoreboard } from "@/hooks/useScoreboard";
 import { useSkin } from "@/hooks/useSkin";
+import { useTvMode } from "@/hooks/useTvMode";
 import { useVoice } from "@/hooks/useVoice";
 import { blip } from "@/lib/blip";
 import { roar } from "@/lib/crowd";
@@ -43,6 +45,7 @@ export function App() {
 
   const liveQuitada = quitadaOf(state.live.score, state.rules);
   const { celebration, celebrate, scope } = useCelebration(pixel);
+  const { tv, enterTv, exitTv } = useTvMode();
 
   function onGoal(player: Player, delta: 1 | -1) {
     const current = state.live.score;
@@ -100,6 +103,24 @@ export function App() {
     }
   }
 
+  if (tv) {
+    return (
+      <>
+        <TvScoreboard
+          scope={scope}
+          live={state.live}
+          matchNumber={state.matches.length + 1}
+          today={today}
+          quitada={liveQuitada}
+          onGoal={onGoal}
+          onFinish={onFinish}
+          onExit={exitTv}
+        />
+        <GoalFlash celebration={celebration} pixel={pixel} />
+      </>
+    );
+  }
+
   return (
     <div className="pt-5 pr-[max(16px,env(safe-area-inset-right))] pb-10 pl-[max(16px,env(safe-area-inset-left))]">
       <main ref={scope} className="ui-device mx-auto flex max-w-180 flex-col gap-6">
@@ -134,6 +155,14 @@ export function App() {
                 toggleSkin();
               }}
             />
+            <button
+              type="button"
+              onClick={() => void enterTv()}
+              className="ui-toggle flex items-center gap-2 rounded-full border border-line px-3 py-1.5 font-label text-[13px] font-semibold tracking-[0.12em] text-muted uppercase hover:text-chalk"
+            >
+              <Maximize aria-hidden className="ui-icon size-4" />
+              Tela cheia
+            </button>
           </div>
         </header>
 

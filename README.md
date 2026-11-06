@@ -14,6 +14,10 @@ Projeto pessoal, feito por diversão.
 - **Narração:** grito de gol de narrador ("Gooool! Gol, gol, gol! É do Kauã! 2 a 1 para o
   Kauã.") com rugido de torcida, gol anulado e fim de jogo com a situação do dia. Liga e
   desliga no botão **Narração**.
+- **Tela cheia (modo TV):** o botão **Tela cheia** deixa só o placar, gigante, para colocar no
+  monitor. Atalhos: `1` / `2` gol do Felipe / do Kauã, `Shift` + número tira o gol, `Enter`
+  encerra a partida, `Esc` sai. A tela fica acesa enquanto o placar estiver aberto (quando o
+  navegador permite).
 - **Comemoração:** a cada gol a tela treme, os botões pulam, sobem fogos de artifício na cor de
   quem marcou e um "GOL!" gigante estoura no meio da tela ("QUITOU!" com fogos dobrados na
   quitada, "VENCEU!" ao encerrar). No 8-bit os fogos são de pixel. Quem usa "reduzir

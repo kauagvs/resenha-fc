@@ -22,7 +22,7 @@ bun run build:artifact   # gera dist-artifact/resenha-fc.html, o arquivo publica
 - `src/domain/` regras puras (sem React): resultado, quitada, dias, estatísticas. Tem testes.
 - `src/storage/` onde o placar fica salvo. `store.ts` escolhe: banco online do Artifact
   (`cloud.ts`, quando `window.claude` existe) ou `localStorage` (`matches.ts`).
-- `src/hooks/` estado e preferências (placar, 8-bit, narração, comemoração).
+- `src/hooks/` estado e preferências (placar, 8-bit, narração, comemoração, modo TV).
 - `src/lib/` efeitos sem React: voz (Web Speech), torcida e bipes (Web Audio), fogos, formatação.
 - `src/components/` UI. Imports entre pastas usam o atalho `@/`.
 
