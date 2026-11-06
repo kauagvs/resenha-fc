@@ -1,5 +1,7 @@
-import type { LiveMatch, Player, Rules } from "../domain/match";
-import { PLAYERS, QUITADA_MARGIN } from "../domain/match";
+import { Flag, Goal, Swords } from "lucide-react";
+import { motion } from "motion/react";
+import type { LiveMatch, Player, Rules } from "@/domain/match";
+import { PLAYERS, QUITADA_MARGIN } from "@/domain/match";
 import { ConfirmButton } from "./ConfirmButton";
 import { Switch } from "./Switch";
 
@@ -52,11 +54,14 @@ export function Scoreboard({
 
       {quitada && (
         <div role="status" className="mt-5 flex flex-col items-center gap-1 text-center">
-          <p
-            className={`${SIDE[quitada].text} ui-quitada animate-stamp font-display text-5xl font-black tracking-[0.04em] uppercase`}
+          <motion.p
+            initial={{ scale: 2.4, rotate: -14, opacity: 0 }}
+            animate={{ scale: 1, rotate: -6, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 380, damping: 12 }}
+            className={`${SIDE[quitada].text} ui-quitada font-display text-5xl font-black tracking-[0.04em] uppercase`}
           >
             Quitada!
-          </p>
+          </motion.p>
           <p className="text-sm text-muted">
             {PLAYERS[quitada].name} abriu {QUITADA_MARGIN} de diferença. Toque em “Encerrar partida”
             para registrar.
@@ -65,13 +70,15 @@ export function Scoreboard({
       )}
 
       <div className="mt-5 flex flex-wrap justify-center gap-2.5">
-        <button
+        <motion.button
           type="button"
           onClick={onFinish}
-          className="ui-btn ui-finish rounded-[10px] bg-chalk px-5 py-3 font-label text-[15px] font-semibold tracking-[0.08em] text-night uppercase"
+          whileTap={{ scale: 0.94 }}
+          className="ui-btn ui-finish flex items-center gap-2 rounded-[10px] bg-chalk px-5 py-3 font-label text-[15px] font-semibold tracking-[0.08em] text-night uppercase"
         >
+          <Flag aria-hidden className="ui-icon size-4" />
           Encerrar partida
-        </button>
+        </motion.button>
         <ConfirmButton
           label="Zerar placar"
           confirmLabel="Confirmar zerar"
@@ -83,6 +90,7 @@ export function Scoreboard({
       <div className="mt-4 flex flex-col items-center gap-1">
         <Switch
           label={`Regra da quitada · ${QUITADA_MARGIN} gols`}
+          icon={Swords}
           checked={rules.quitada}
           onToggle={() => onRules({ ...rules, quitada: !rules.quitada })}
         />
@@ -127,15 +135,17 @@ function Side({
     </button>
   );
   const plus = (
-    <button
+    <motion.button
       type="button"
       aria-label={`Gol do ${name}`}
       disabled={locked}
       onClick={() => onGoal(player, 1)}
-      className={`${color.bg} ui-btn rounded-[10px] px-4 py-3 font-label text-base font-semibold tracking-[0.06em] text-night uppercase active:translate-y-px disabled:cursor-default disabled:opacity-35 sm:px-5`}
+      whileTap={locked ? undefined : { scale: 0.88 }}
+      className={`${color.bg} ui-btn flex items-center gap-1.5 rounded-[10px] px-4 py-3 font-label text-base font-semibold tracking-[0.06em] text-night uppercase disabled:cursor-default disabled:opacity-35 sm:px-5`}
     >
+      <Goal aria-hidden className="ui-icon size-4" />
       Gol
-    </button>
+    </motion.button>
   );
 
   return (
@@ -154,13 +164,16 @@ function Side({
         maxLength={24}
         className="ui-input w-full max-w-36 rounded-md border border-transparent bg-transparent px-2 py-1 text-center font-label text-sm tracking-wide text-muted placeholder:text-line hover:border-line focus:border-line focus:outline-none"
       />
-      <output
+      <motion.output
         key={goals}
         aria-live="polite"
-        className={`${color.text} ui-score led animate-bump font-display text-[clamp(88px,26vw,156px)] leading-[0.85] font-black tabular-nums`}
+        initial={{ scale: 1.35 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 500, damping: 15 }}
+        className={`${color.text} ui-score led font-display text-[clamp(88px,26vw,156px)] leading-[0.85] font-black tabular-nums`}
       >
         {goals}
-      </output>
+      </motion.output>
       <div className="flex gap-2">
         {mirrored ? (
           <>

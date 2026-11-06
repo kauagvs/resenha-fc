@@ -32,9 +32,9 @@ A escolha fica salva no navegador. O visual inteiro está em `src/styles.css`, n
 
 ## Stack
 
-- React 19 + TypeScript
-- Vite 8
-- Tailwind CSS v4 (tokens em `src/styles.css`, bloco `@theme`)
+- React 19 + TypeScript + Vite + Tailwind CSS v4
+- Motion (animações), canvas-confetti (fogos), lucide-react (ícones)
+- Vitest (testes), ESLint + Prettier, CI no GitHub Actions
 
 ## Rodando
 
@@ -43,7 +43,8 @@ bun install
 bun run dev
 ```
 
-`bun run build` gera a versão estática em `dist/` (pode ser publicada em qualquer host estático).
+- `bun run check`: tipos, lint, formatação e testes
+- `bun run build`: versão estática em `dist/`
 
 ## Estrutura
 

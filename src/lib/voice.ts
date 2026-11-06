@@ -1,5 +1,5 @@
-import type { MatchDay, Player, Score } from "../domain/match";
-import { PLAYERS, outcomeOf } from "../domain/match";
+import type { MatchDay, Player, Score } from "@/domain/match";
+import { PLAYERS, outcomeOf } from "@/domain/match";
 
 /** Um trecho da narração. `rate` baixo estica a palavra ("Gooool"), `pitch` alto empolga. */
 export type Line = string | { text: string; rate?: number; pitch?: number };

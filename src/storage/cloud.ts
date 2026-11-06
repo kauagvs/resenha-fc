@@ -1,5 +1,5 @@
-import type { LiveMatch, Match, Rules } from "../domain/match";
-import { emptyLiveMatch } from "../domain/match";
+import type { LiveMatch, Match, Rules } from "@/domain/match";
+import { emptyLiveMatch } from "@/domain/match";
 import type { StoredState } from "./matches";
 import { initialState, parseLive, parseMatch, parseRules } from "./matches";
 import type { ScoreStore, StoreStatus } from "./store";
@@ -163,13 +163,13 @@ function createCloudStore(db: Db): ScoreStore {
   };
 }
 
-function parseCloudLive(d: Record<string, unknown> | undefined): LiveMatch {
+export function parseCloudLive(d: Record<string, unknown> | undefined): LiveMatch {
   if (d && "f" in d && !("score" in d))
     return parseLive({ score: { felipe: d["f"], kaua: d["k"] } });
   return parseLive(d);
 }
 
-function parseCloudMatch(id: string, d: Record<string, unknown> | undefined): Match[] {
+export function parseCloudMatch(id: string, d: Record<string, unknown> | undefined): Match[] {
   if (d && "f" in d && !("score" in d)) {
     const at = Number(d["at"]);
     return parseMatch({

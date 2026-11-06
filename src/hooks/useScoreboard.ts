@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { LiveMatch, Match, Player, Rules } from "../domain/match";
-import { emptyLiveMatch, seriesStats } from "../domain/match";
-import type { StoredState } from "../storage/matches";
-import { initialState } from "../storage/matches";
-import type { ScoreStore, StoreStatus } from "../storage/store";
-import { openStore } from "../storage/store";
+import type { LiveMatch, Match, Player, Rules } from "@/domain/match";
+import { emptyLiveMatch, seriesStats } from "@/domain/match";
+import type { StoredState } from "@/storage/matches";
+import { initialState } from "@/storage/matches";
+import type { ScoreStore, StoreStatus } from "@/storage/store";
+import { openStore } from "@/storage/store";
 
 export function useScoreboard() {
   const storeRef = useRef<ScoreStore | null>(null);

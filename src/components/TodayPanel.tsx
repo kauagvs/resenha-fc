@@ -1,6 +1,7 @@
-import type { MatchDay } from "../domain/match";
-import { PLAYERS } from "../domain/match";
-import { dayLabel } from "./MatchHistory";
+import type { MatchDay } from "@/domain/match";
+import { PLAYERS } from "@/domain/match";
+import { dayLabel } from "@/lib/format";
+import { AnimatedNumber } from "./AnimatedNumber";
 import { Heading } from "./SeriesSummary";
 
 const LEADER_COLOR = { felipe: "text-felipe", kaua: "text-kaua", draw: "text-draw" } as const;
@@ -35,9 +36,9 @@ export function TodayPanel({ todayKey, day }: { todayKey: string; day: MatchDay 
             aria-label={`Felipe ${day.wins.felipe}, Kauã ${day.wins.kaua}`}
             className="ui-today-score font-display text-4xl font-black tabular-nums"
           >
-            <span className="text-felipe">{day.wins.felipe}</span>
+            <AnimatedNumber className="text-felipe" value={day.wins.felipe} />
             <span className="px-1.5 text-muted">×</span>
-            <span className="text-kaua">{day.wins.kaua}</span>
+            <AnimatedNumber className="text-kaua" value={day.wins.kaua} />
           </p>
         )}
       </div>

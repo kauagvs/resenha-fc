@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import type { SeriesStats } from "../domain/match";
-import { PLAYERS } from "../domain/match";
+import type { SeriesStats } from "@/domain/match";
+import { PLAYERS } from "@/domain/match";
+import { AnimatedNumber } from "./AnimatedNumber";
 
 const pct = (n: number, total: number) => (total ? `${(n / total) * 100}%` : "0%");
 
@@ -104,11 +105,10 @@ function Tally({
     <div
       className={`flex flex-col items-center gap-0.5 bg-turf px-2.5 ${small ? "py-2.5" : "py-3.5"}`}
     >
-      <span
+      <AnimatedNumber
+        value={value}
         className={`${color} ${small ? "ui-tally-n-sm text-[30px]" : "ui-tally-n text-[44px]"} font-display leading-none font-black tabular-nums`}
-      >
-        {value}
-      </span>
+      />
       <span className="font-label text-[13px] tracking-widest text-muted uppercase">{label}</span>
     </div>
   );

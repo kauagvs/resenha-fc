@@ -1,5 +1,5 @@
-import type { LiveMatch, Match, Rules } from "../domain/match";
-import { DEFAULT_RULES, emptyLiveMatch } from "../domain/match";
+import type { LiveMatch, Match, Rules } from "@/domain/match";
+import { DEFAULT_RULES, emptyLiveMatch } from "@/domain/match";
 
 /** Persistência no navegador (localStorage), backup em JSON e leitura tolerante dos dados salvos. */
 

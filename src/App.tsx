@@ -1,21 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MatchHistory } from "./components/MatchHistory";
-import { GoalFlash } from "./components/GoalFlash";
-import { Scoreboard } from "./components/Scoreboard";
-import { SeriesSummary } from "./components/SeriesSummary";
-import { Switch } from "./components/Switch";
-import { TodayPanel } from "./components/TodayPanel";
-import type { Player } from "./domain/match";
-import { dayKeyOf, groupByDay, outcomeOf, quitadaOf } from "./domain/match";
-import { useCelebration } from "./hooks/useCelebration";
-import { useScoreboard } from "./hooks/useScoreboard";
-import { useSkin } from "./hooks/useSkin";
-import { useVoice } from "./hooks/useVoice";
-import { blip } from "./lib/blip";
-import { roar } from "./lib/crowd";
-import { finalCall, goalCall, quitadaCall, say, undoCall } from "./lib/voice";
-import { exportBackup, parseBackup } from "./storage/matches";
-import type { StoreStatus } from "./storage/store";
+import { MatchHistory } from "@/components/MatchHistory";
+import { Gamepad2, Volume2, VolumeX } from "lucide-react";
+import { GoalFlash } from "@/components/GoalFlash";
+import { Scoreboard } from "@/components/Scoreboard";
+import { SeriesSummary } from "@/components/SeriesSummary";
+import { Switch } from "@/components/Switch";
+import { TodayPanel } from "@/components/TodayPanel";
+import type { Player } from "@/domain/match";
+import { dayKeyOf, groupByDay, outcomeOf, quitadaOf } from "@/domain/match";
+import { useCelebration } from "@/hooks/useCelebration";
+import { useScoreboard } from "@/hooks/useScoreboard";
+import { useSkin } from "@/hooks/useSkin";
+import { useVoice } from "@/hooks/useVoice";
+import { blip } from "@/lib/blip";
+import { roar } from "@/lib/crowd";
+import { finalCall, goalCall, quitadaCall, say, undoCall } from "@/lib/voice";
+import { exportBackup, parseBackup } from "@/storage/matches";
+import type { StoreStatus } from "@/storage/store";
 
 const STATUS: Record<StoreStatus, { text: string; warn?: boolean }> = {
   loading: { text: "Conectando…" },
@@ -41,7 +42,7 @@ export function App() {
   );
 
   const liveQuitada = quitadaOf(state.live.score, state.rules);
-  const { celebration, celebrate } = useCelebration(pixel);
+  const { celebration, celebrate, scope } = useCelebration(pixel);
 
   function onGoal(player: Player, delta: 1 | -1) {
     const current = state.live.score;
@@ -100,10 +101,8 @@ export function App() {
   }
 
   return (
-    <div className="pr-[max(16px,env(safe-area-inset-right))] pl-[max(16px,env(safe-area-inset-left))] pt-5 pb-10">
-      <main
-        className={`ui-device mx-auto flex max-w-180 flex-col gap-6 ${celebration ? "is-celebrating" : ""} ${celebration?.kind === "quitada" ? "is-quitada" : ""}`}
-      >
+    <div className="pt-5 pr-[max(16px,env(safe-area-inset-right))] pb-10 pl-[max(16px,env(safe-area-inset-left))]">
+      <main ref={scope} className="ui-device mx-auto flex max-w-180 flex-col gap-6">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
             <span className="font-label text-[13px] tracking-[0.14em] text-muted uppercase">
@@ -119,6 +118,7 @@ export function App() {
           <div className="flex flex-wrap gap-2">
             <Switch
               label="Narração"
+              icon={voiceOn ? Volume2 : VolumeX}
               checked={voiceOn}
               onToggle={() => {
                 if (!voiceOn) say(["Narração ligada. Bola rolando!"]);
@@ -127,6 +127,7 @@ export function App() {
             />
             <Switch
               label="8-bit"
+              icon={Gamepad2}
               checked={pixel}
               onToggle={() => {
                 if (!pixel) blip("whistle");
@@ -187,7 +188,7 @@ export function App() {
           </footer>
         )}
       </main>
-      <GoalFlash celebration={celebration} />
+      <GoalFlash celebration={celebration} pixel={pixel} />
     </div>
   );
 }

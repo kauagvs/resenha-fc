@@ -15,46 +15,6 @@
   --font-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
   --font-body: "Barlow", system-ui, sans-serif;
   --font-label: "Barlow Condensed", "Arial Narrow", sans-serif;
-
-  --animate-bump: bump 0.35s ease-out;
-  --animate-goal-flash: goal-flash 1.3s cubic-bezier(0.2, 1.4, 0.4, 1) both;
-  @keyframes goal-flash {
-    0% {
-      transform: scale(0.2) rotate(-12deg);
-      opacity: 0;
-    }
-    25% {
-      transform: scale(1.15) rotate(-4deg);
-      opacity: 1;
-    }
-    70% {
-      transform: scale(1) rotate(-4deg);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(1.6) rotate(-4deg);
-      opacity: 0;
-    }
-  }
-  --animate-stamp: stamp 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
-  @keyframes stamp {
-    0% {
-      transform: scale(2.4) rotate(-14deg);
-      opacity: 0;
-    }
-    100% {
-      transform: scale(1) rotate(-6deg);
-      opacity: 1;
-    }
-  }
-  @keyframes bump {
-    0% {
-      transform: scale(1.18);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
 }
 
 :root {
@@ -212,7 +172,6 @@ button {
   line-height: 1;
   padding-block: 6px;
   text-shadow: 6px 6px 0 var(--px-ink);
-  animation: bump 0.3s steps(3);
 }
 [data-skin="pixel"] .ui-vs {
   font-size: 22px;
@@ -340,7 +299,6 @@ button {
   font-size: 26px;
   font-weight: 400;
   text-shadow: 4px 4px 0 var(--px-ink);
-  animation: stamp 0.4s steps(4) both;
 }
 [data-skin="pixel"] .ui-rule-hint {
   color: var(--color-muted);
@@ -349,78 +307,21 @@ button {
   font-size: 9px;
 }
 
-/* Comemoração de gol: tela treme, botões pulam, "GOL!" gigante */
-@keyframes shake {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  15% {
-    transform: translate(-7px, 3px) rotate(-0.5deg);
-  }
-  30% {
-    transform: translate(6px, -4px) rotate(0.5deg);
-  }
-  45% {
-    transform: translate(-5px, 2px);
-  }
-  60% {
-    transform: translate(4px, -2px);
-  }
-  80% {
-    transform: translate(-2px, 1px);
-  }
-}
-@keyframes hop {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  35% {
-    transform: translateY(-12px) scale(1.06);
-  }
-  65% {
-    transform: translateY(3px) scale(0.98);
-  }
-}
-.is-celebrating {
-  animation: shake 0.55s ease-out;
-}
-.is-celebrating.is-quitada {
-  animation: shake 0.55s ease-out 2;
-}
-.is-celebrating .ui-btn,
-.is-celebrating .ui-toggle,
-.is-celebrating .ui-pill,
-.is-celebrating .ui-lcd {
-  animation: hop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
-}
-.is-celebrating .ui-btn:nth-of-type(2n),
-.is-celebrating .ui-toggle:nth-of-type(2n) {
-  animation-delay: 0.07s;
-}
-.is-celebrating .ui-score {
-  animation: bump 0.5s ease-out;
-}
+/* "GOL!" gigante (animado pelo Motion em GoalFlash.tsx) */
 .ui-goal-flash {
   text-shadow:
     0 0 40px currentColor,
     0 6px 0 rgb(0 0 0 / 0.5);
   -webkit-text-stroke: 2px rgb(0 0 0 / 0.35);
 }
-[data-skin="pixel"] .is-celebrating {
-  animation-timing-function: steps(5);
-}
-[data-skin="pixel"] .is-celebrating .ui-btn,
-[data-skin="pixel"] .is-celebrating .ui-toggle,
-[data-skin="pixel"] .is-celebrating .ui-pill,
-[data-skin="pixel"] .is-celebrating .ui-lcd {
-  animation-timing-function: steps(3);
-}
 [data-skin="pixel"] .ui-goal-flash {
   font-size: clamp(36px, 11vw, 96px);
   font-weight: 400;
   -webkit-text-stroke: 0;
   text-shadow: 6px 6px 0 var(--px-ink);
-  animation-timing-function: steps(6);
+}
+
+/* Ícones vetoriais não combinam com o visual de pixel. */
+[data-skin="pixel"] .ui-icon {
+  display: none;
 }

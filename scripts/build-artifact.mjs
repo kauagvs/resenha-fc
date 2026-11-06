@@ -25,6 +25,7 @@ const js = [...head.matchAll(/<script\s[^>]*src="(\/assets\/[^"]+\.js)"[^>]*><\/
 if (!title || !css || !js) throw new Error("dist/index.html não tem o formato esperado do Vite.");
 
 const page = [
+  '<meta charset="utf-8">',
   title,
   '<meta name="claude:viewport-fit-sides" content="cover">',
   ...keep,

@@ -1,4 +1,4 @@
-import type { LiveMatch, Match, Rules } from "../domain/match";
+import type { LiveMatch, Match, Rules } from "@/domain/match";
 import { openCloudStore } from "./cloud";
 import type { StoredState } from "./matches";
 import { loadState, saveState } from "./matches";
@@ -8,14 +8,7 @@ import { loadState, saveState } from "./matches";
  * Artifact no claude.ai é o banco online do Artifact (mesmo placar em qualquer aparelho).
  */
 export type StoreStatus =
-  | "loading"
-  | "synced"
-  | "offline"
-  | "error"
-  | "readonly"
-  | "full"
-  | "local"
-  | "local-failed";
+  "loading" | "synced" | "offline" | "error" | "readonly" | "full" | "local" | "local-failed";
 
 export type ScoreStore = {
   kind: "local" | "cloud";

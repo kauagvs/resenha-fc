@@ -1,17 +1,10 @@
-import type { Match, Rules } from "../domain/match";
-import { PLAYERS, dateOfDayKey, groupByDay, outcomeOf, quitadaOf } from "../domain/match";
+import { AnimatePresence, motion } from "motion/react";
+import type { Match, Rules } from "@/domain/match";
+import { PLAYERS, groupByDay, outcomeOf, quitadaOf } from "@/domain/match";
+import { dayLabel, timeLabel } from "@/lib/format";
+import { AnimatedNumber } from "./AnimatedNumber";
 import { ConfirmButton } from "./ConfirmButton";
 import { Heading } from "./SeriesSummary";
-
-const dayFmt = new Intl.DateTimeFormat("pt-BR", {
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-});
-const timeFmt = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
-/** "sex., 6 de nov." */
-export const dayLabel = (key: string) => dayFmt.format(dateOfDayKey(key));
 
 const PILL = {
   felipe: { label: "Felipe", className: "text-felipe" },
@@ -44,42 +37,50 @@ export function MatchHistory({ matches, rules, todayKey, onDelete }: Props) {
         </p>
       )}
       <div className="flex flex-col gap-4">
-        {days.map((day) => {
-          const verdict =
-            day.leader === "draw"
-              ? "Dia empatado"
-              : `${PLAYERS[day.leader].name} ${day.key === todayKey ? "ganhando" : "venceu"} o dia`;
-          return (
-            <div
-              key={day.key}
-              className="ui-panel flex flex-col divide-y divide-line overflow-hidden rounded-xl border border-line bg-turf"
-            >
-              <div className="ui-day-head flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 bg-line/35 px-3.5 py-2.5">
-                <span className="font-label text-[13px] font-semibold tracking-[0.1em] text-chalk uppercase">
-                  {dayLabel(day.key)}
-                  {day.key === todayKey && " · hoje"}
-                </span>
-                <span className="flex items-baseline gap-2 text-sm">
-                  <span className={PILL[day.leader].className}>{verdict}</span>
-                  <span className="font-display text-lg font-black tabular-nums">
-                    <span className="text-felipe">{day.wins.felipe}</span>
-                    <span className="px-1 text-muted">×</span>
-                    <span className="text-kaua">{day.wins.kaua}</span>
+        <AnimatePresence initial={false}>
+          {days.map((day) => {
+            const verdict =
+              day.leader === "draw"
+                ? "Dia empatado"
+                : `${PLAYERS[day.leader].name} ${day.key === todayKey ? "ganhando" : "venceu"} o dia`;
+            return (
+              <motion.div
+                key={day.key}
+                layout
+                initial={{ opacity: 0, y: -16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                className="ui-panel flex flex-col divide-y divide-line overflow-hidden rounded-xl border border-line bg-turf"
+              >
+                <div className="ui-day-head flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 bg-line/35 px-3.5 py-2.5">
+                  <span className="font-label text-[13px] font-semibold tracking-[0.1em] text-chalk uppercase">
+                    {dayLabel(day.key)}
+                    {day.key === todayKey && " · hoje"}
                   </span>
-                </span>
-              </div>
-              {[...day.matches].reverse().map((match) => (
-                <MatchRow
-                  key={match.id}
-                  match={match}
-                  number={numbers.get(match.id) ?? 0}
-                  quitada={quitadaOf(match.score, rules) !== null}
-                  onDelete={onDelete}
-                />
-              ))}
-            </div>
-          );
-        })}
+                  <span className="flex items-baseline gap-2 text-sm">
+                    <span className={PILL[day.leader].className}>{verdict}</span>
+                    <span className="font-display text-lg font-black tabular-nums">
+                      <AnimatedNumber className="text-felipe" value={day.wins.felipe} />
+                      <span className="px-1 text-muted">×</span>
+                      <AnimatedNumber className="text-kaua" value={day.wins.kaua} />
+                    </span>
+                  </span>
+                </div>
+                <AnimatePresence initial={false}>
+                  {[...day.matches].reverse().map((match) => (
+                    <MatchRow
+                      key={match.id}
+                      match={match}
+                      number={numbers.get(match.id) ?? 0}
+                      quitada={quitadaOf(match.score, rules) !== null}
+                      onDelete={onDelete}
+                    />
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
     </section>
   );
@@ -101,7 +102,14 @@ function MatchRow({
     ? `${match.clubs.felipe || "?"} × ${match.clubs.kaua || "?"}`
     : null;
   return (
-    <div className="grid grid-cols-[2.4em_1fr_auto] items-center gap-2 px-3 py-2.5 sm:grid-cols-[3.2em_1fr_auto] sm:gap-3 sm:px-3.5">
+    <motion.div
+      layout
+      initial={{ opacity: 0, x: -24, backgroundColor: "rgb(255 255 255 / 0.12)" }}
+      animate={{ opacity: 1, x: 0, backgroundColor: "rgb(255 255 255 / 0)" }}
+      exit={{ opacity: 0, x: 40, transition: { duration: 0.2 } }}
+      transition={{ type: "spring", stiffness: 420, damping: 30 }}
+      className="grid grid-cols-[2.4em_1fr_auto] items-center gap-2 px-3 py-2.5 sm:grid-cols-[3.2em_1fr_auto] sm:gap-3 sm:px-3.5"
+    >
       <span className="font-label text-sm text-muted tabular-nums">#{number}</span>
       <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
         <span className="font-display text-2xl font-black tracking-wide tabular-nums">
@@ -122,7 +130,7 @@ function MatchRow({
           </span>
         )}
         <span className="text-[13px] text-muted">
-          {timeFmt.format(new Date(match.playedAt))}
+          {timeLabel(match.playedAt)}
           {clubs && ` · ${clubs}`}
         </span>
       </div>
@@ -133,6 +141,6 @@ function MatchRow({
         onConfirm={() => onDelete(match.id)}
         className="ui-btn-text rounded-lg border border-transparent px-2.5 py-1.5 font-label text-[13px] tracking-wide text-muted uppercase hover:border-line"
       />
-    </div>
+    </motion.div>
   );
 }
