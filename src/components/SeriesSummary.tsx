@@ -5,7 +5,7 @@ import { PLAYERS } from "../domain/match";
 const pct = (n: number, total: number) => (total ? `${(n / total) * 100}%` : "0%");
 
 export function SeriesSummary({ stats }: { stats: SeriesStats }) {
-  const { played, wins, draws, goals, biggestWin, streak } = stats;
+  const { played, wins, draws, goals, biggestWin, streak, days } = stats;
 
   const facts: ReactNode[] = [];
   if (played) {
@@ -38,6 +38,7 @@ export function SeriesSummary({ stats }: { stats: SeriesStats }) {
   return (
     <section>
       <Heading>Série</Heading>
+      <SubLabel>Partidas</SubLabel>
       <div className="ui-panel grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line">
         <Tally value={wins.felipe} label="Felipe" color="text-felipe" />
         <Tally value={draws} label="Empates" color="text-draw" />
@@ -54,6 +55,12 @@ export function SeriesSummary({ stats }: { stats: SeriesStats }) {
         />
         <span className="bg-kaua transition-[width]" style={{ width: pct(wins.kaua, played) }} />
       </div>
+      <SubLabel className="mt-5">Dias vencidos</SubLabel>
+      <div className="ui-panel grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line">
+        <Tally value={days.felipe} label="Felipe" color="text-felipe" small />
+        <Tally value={days.draw} label="Empatados" color="text-draw" small />
+        <Tally value={days.kaua} label="Kauã" color="text-kaua" small />
+      </div>
       {facts.length > 0 && (
         <ul className="ui-facts mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted [&_b]:font-semibold [&_b]:text-chalk [&_b]:tabular-nums">
           {facts.map((f, i) => (
@@ -65,11 +72,33 @@ export function SeriesSummary({ stats }: { stats: SeriesStats }) {
   );
 }
 
-function Tally({ value, label, color }: { value: number; label: string; color: string }) {
+function SubLabel({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className="flex flex-col items-center gap-0.5 bg-turf px-2.5 py-3.5">
+    <p
+      className={`ui-sublabel mb-1.5 font-label text-xs tracking-[0.1em] text-muted uppercase ${className}`}
+    >
+      {children}
+    </p>
+  );
+}
+
+function Tally({
+  value,
+  label,
+  color,
+  small = false,
+}: {
+  value: number;
+  label: string;
+  color: string;
+  small?: boolean;
+}) {
+  return (
+    <div
+      className={`flex flex-col items-center gap-0.5 bg-turf px-2.5 ${small ? "py-2.5" : "py-3.5"}`}
+    >
       <span
-        className={`${color} ui-tally-n font-display text-[44px] leading-none font-black tabular-nums`}
+        className={`${color} ${small ? "ui-tally-n-sm text-[30px]" : "ui-tally-n text-[44px]"} font-display leading-none font-black tabular-nums`}
       >
         {value}
       </span>

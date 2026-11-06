@@ -1,10 +1,16 @@
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MatchHistory } from "./components/MatchHistory";
 import { Scoreboard } from "./components/Scoreboard";
 import { SeriesSummary } from "./components/SeriesSummary";
+import { Switch } from "./components/Switch";
+import { TodayPanel } from "./components/TodayPanel";
+import type { Player } from "./domain/match";
+import { dayKeyOf, groupByDay } from "./domain/match";
 import { useScoreboard } from "./hooks/useScoreboard";
 import { useSkin } from "./hooks/useSkin";
+import { useVoice } from "./hooks/useVoice";
 import { blip } from "./lib/blip";
+import { finalCall, goalCall, say, undoCall } from "./lib/voice";
 import { exportBackup, parseBackup } from "./storage/matches";
 import type { StoreStatus } from "./storage/store";
 
@@ -24,6 +30,35 @@ export function App() {
   const { state } = board;
   const { skin, toggleSkin } = useSkin();
   const pixel = skin === "pixel";
+  const { voiceOn, toggleVoice } = useVoice();
+  const todayKey = useTodayKey();
+  const today = useMemo(
+    () => groupByDay(state.matches).find((d) => d.key === todayKey),
+    [state.matches, todayKey],
+  );
+
+  function onGoal(player: Player, delta: 1 | -1) {
+    const current = state.live.score;
+    if (delta < 0 && current[player] === 0) return;
+    if (pixel) blip(delta > 0 ? "goal" : "undo");
+    if (voiceOn) {
+      const next = { ...current, [player]: current[player] + delta };
+      say(delta > 0 ? goalCall(player, next) : undoCall());
+    }
+    board.addGoal(player, delta);
+  }
+
+  function onFinish() {
+    const finished = board.finishMatch();
+    if (!finished) return;
+    if (pixel) blip("whistle");
+    if (voiceOn) {
+      const day = groupByDay(finished.matches).find(
+        (d) => d.key === dayKeyOf(finished.match.playedAt),
+      );
+      say(finalCall(finished.match.score, day));
+    }
+  }
   const fileInput = useRef<HTMLInputElement>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -61,42 +96,40 @@ export function App() {
               {STATUS[board.status].text}
             </span>
           </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={pixel}
-            onClick={() => {
-              if (!pixel) blip("whistle");
-              toggleSkin();
-            }}
-            className="ui-toggle group flex items-center gap-2.5 rounded-full border border-line px-3 py-1.5 font-label text-[13px] font-semibold tracking-[0.12em] text-muted uppercase hover:text-chalk"
-          >
-            8-bit
-            <span className="ui-toggle-track relative h-5 w-9 rounded-full bg-line transition-colors group-aria-checked:bg-felipe">
-              <span className="ui-toggle-knob absolute top-0.5 left-0.5 size-4 rounded-full bg-chalk transition-transform group-aria-checked:translate-x-4" />
-            </span>
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <Switch
+              label="Narração"
+              checked={voiceOn}
+              onToggle={() => {
+                if (!voiceOn) say("Narração ligada. Bola rolando!");
+                toggleVoice();
+              }}
+            />
+            <Switch
+              label="8-bit"
+              checked={pixel}
+              onToggle={() => {
+                if (!pixel) blip("whistle");
+                toggleSkin();
+              }}
+            />
+          </div>
         </header>
 
         <Scoreboard
           live={state.live}
           matchNumber={state.matches.length + 1}
-          onGoal={(player, delta) => {
-            if (pixel && (delta > 0 || state.live.score[player] > 0))
-              blip(delta > 0 ? "goal" : "undo");
-            board.addGoal(player, delta);
-          }}
+          onGoal={onGoal}
           onClub={board.setClub}
-          onFinish={() => {
-            if (pixel) blip("whistle");
-            board.finishMatch();
-          }}
+          onFinish={onFinish}
           onReset={board.resetScore}
         />
 
+        <TodayPanel todayKey={todayKey} day={today} />
+
         <SeriesSummary stats={board.stats} />
 
-        <MatchHistory matches={state.matches} onDelete={board.deleteMatch} />
+        <MatchHistory matches={state.matches} todayKey={todayKey} onDelete={board.deleteMatch} />
 
         {board.kind === "local" && (
           <footer className="ui-footer flex flex-wrap items-center gap-3 text-sm text-muted">
@@ -128,4 +161,14 @@ export function App() {
       </main>
     </div>
   );
+}
+
+/** Chave do dia atual; atualiza sozinha quando o dia vira (às 5h). */
+function useTodayKey() {
+  const [key, setKey] = useState(() => dayKeyOf(new Date()));
+  useEffect(() => {
+    const id = setInterval(() => setKey(dayKeyOf(new Date())), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  return key;
 }

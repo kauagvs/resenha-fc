@@ -271,3 +271,33 @@ button {
   background: var(--color-felipe);
   transition: transform 0.15s steps(2);
 }
+
+[data-skin="pixel"] .ui-sublabel {
+  color: var(--px-ink);
+  font-size: 9px;
+}
+[data-skin="pixel"] .ui-tally-n-sm {
+  font-size: 22px;
+  font-weight: 400;
+  padding-block: 4px;
+  text-shadow: 3px 3px 0 var(--px-ink);
+}
+[data-skin="pixel"] .ui-today-title {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-shadow: 2px 2px 0 var(--px-ink);
+}
+[data-skin="pixel"] .ui-today-score {
+  font-size: 26px;
+  font-weight: 400;
+  text-shadow: 3px 3px 0 var(--px-ink);
+}
+[data-skin="pixel"] .ui-day-head {
+  background: rgb(0 0 0 / 0.25);
+}
+[data-skin="pixel"] .ui-day-head .font-display {
+  font-size: 14px;
+  font-weight: 400;
+}

@@ -43,6 +43,8 @@ export type SeriesStats = {
   biggestWin: Match | null;
   /** Sequência de vitórias seguidas do mesmo jogador nas partidas mais recentes (>= 2). */
   streak: { player: Player; count: number } | null;
+  /** Quantos dias cada um venceu (e quantos terminaram empatados). */
+  days: Record<Outcome, number>;
 };
 
 /** `matches` em qualquer ordem. */
@@ -54,6 +56,7 @@ export function seriesStats(matches: Match[]): SeriesStats {
     goals: { felipe: 0, kaua: 0 },
     biggestWin: null,
     streak: null,
+    days: { felipe: 0, kaua: 0, draw: 0 },
   };
 
   for (const m of matches) {
@@ -84,9 +87,60 @@ export function seriesStats(matches: Match[]): SeriesStats {
     }
   }
 
+  for (const day of groupByDay(matches)) stats.days[day.leader]++;
+
   return stats;
 }
 
 export function sortNewestFirst(matches: Match[]): Match[] {
   return [...matches].sort((a, b) => b.playedAt.localeCompare(a.playedAt));
+}
+
+/**
+ * Dia da resenha. Partidas antes das 5h contam para o dia anterior: jogo que vira a
+ * madrugada é o mesmo dia. Usa o fuso do aparelho.
+ */
+const DAY_CUTOFF_MS = 5 * 60 * 60 * 1000;
+
+export function dayKeyOf(date: Date | string): string {
+  const d = new Date(new Date(date).getTime() - DAY_CUTOFF_MS);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** Data (meia-noite local) do dia `key`, para exibir. */
+export function dateOfDayKey(key: string): Date {
+  const [y = 0, m = 1, d = 1] = key.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export type MatchDay = {
+  key: string;
+  /** Em ordem cronológica. */
+  matches: Match[];
+  wins: Record<Player, number>;
+  draws: number;
+  /** Quem venceu mais partidas no dia. */
+  leader: Outcome;
+};
+
+/** Dias do mais recente para o mais antigo. */
+export function groupByDay(matches: Match[]): MatchDay[] {
+  const byKey = new Map<string, Match[]>();
+  for (const m of [...matches].sort((a, b) => a.playedAt.localeCompare(b.playedAt))) {
+    const key = dayKeyOf(m.playedAt);
+    byKey.set(key, [...(byKey.get(key) ?? []), m]);
+  }
+  return [...byKey.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([key, dayMatches]) => {
+      const wins = { felipe: 0, kaua: 0 };
+      let draws = 0;
+      for (const m of dayMatches) {
+        const outcome = outcomeOf(m.score);
+        if (outcome === "draw") draws++;
+        else wins[outcome]++;
+      }
+      return { key, matches: dayMatches, wins, draws, leader: outcomeOf(wins) };
+    });
 }

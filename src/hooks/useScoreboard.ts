@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { LiveMatch, Player } from "../domain/match";
+import type { LiveMatch, Match, Player } from "../domain/match";
 import { emptyLiveMatch, seriesStats } from "../domain/match";
 import type { StoredState } from "../storage/matches";
 import type { ScoreStore, StoreStatus } from "../storage/store";
@@ -51,18 +51,21 @@ export function useScoreboard() {
     [updateLive],
   );
 
-  const finishMatch = useCallback(() => {
+  /** Registra a partida em andamento e devolve o histórico já com ela. */
+  const finishMatch = useCallback((): { match: Match; matches: Match[] } | null => {
     const store = storeRef.current;
-    if (!store) return;
-    const { live } = store.get();
-    store.addMatch({
+    if (!store) return null;
+    const { live, matches } = store.get();
+    const match: Match = {
       id: crypto.randomUUID(),
       score: live.score,
       clubs: { felipe: live.clubs.felipe.trim(), kaua: live.clubs.kaua.trim() },
       playedAt: new Date().toISOString(),
-    });
+    };
+    store.addMatch(match);
     // Mantém os times escolhidos para a revanche.
     store.setLive(emptyLiveMatch(live.clubs));
+    return { match, matches: [...matches, match] };
   }, []);
 
   const deleteMatch = useCallback((id: string) => storeRef.current?.deleteMatch(id), []);

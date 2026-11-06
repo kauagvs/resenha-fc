@@ -5,6 +5,15 @@ série acumulada (vitórias, empates, gols, maior goleada, sequência) e histór
 
 Projeto pessoal, feito por diversão.
 
+## Dias e narração
+
+- **Placar do dia:** as partidas são agrupadas por dia, e quem vence mais partidas no dia
+  "ganha o dia". O painel **Hoje** mostra quem está na frente, a série conta os **dias
+  vencidos** e o histórico vem separado por dia. Partidas antes das 5h contam para o dia
+  anterior, para uma resenha que vira a madrugada continuar sendo o mesmo dia.
+- **Narração:** a voz do aparelho fala o gol ("Gol do Kauã! 2 a 1 para o Kauã."), o gol
+  anulado e o fim de jogo com a situação do dia. Liga e desliga no botão **Narração**.
+
 ## Modo 8-bit
 
 O botão **8-BIT** no topo troca o visual para um aparelho portátil retrô: fonte bitmap, botões
@@ -38,6 +47,8 @@ src/
   hooks/useScoreboard.ts estado e ações do placar
   hooks/useSkin.ts       liga/desliga o modo 8-bit
   lib/blip.ts            bipes 8-bit (Web Audio)
+  lib/voice.ts           narração por voz (Web Speech API)
+  hooks/useVoice.ts      liga/desliga a narração
   components/            Scoreboard, SeriesSummary, MatchHistory, ConfirmButton
   App.tsx
 ```
