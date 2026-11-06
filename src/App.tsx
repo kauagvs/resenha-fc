@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MatchHistory } from "./components/MatchHistory";
+import { GoalFlash } from "./components/GoalFlash";
 import { Scoreboard } from "./components/Scoreboard";
 import { SeriesSummary } from "./components/SeriesSummary";
 import { Switch } from "./components/Switch";
 import { TodayPanel } from "./components/TodayPanel";
 import type { Player } from "./domain/match";
-import { dayKeyOf, groupByDay, quitadaOf } from "./domain/match";
+import { dayKeyOf, groupByDay, outcomeOf, quitadaOf } from "./domain/match";
+import { useCelebration } from "./hooks/useCelebration";
 import { useScoreboard } from "./hooks/useScoreboard";
 import { useSkin } from "./hooks/useSkin";
 import { useVoice } from "./hooks/useVoice";
@@ -39,6 +41,7 @@ export function App() {
   );
 
   const liveQuitada = quitadaOf(state.live.score, state.rules);
+  const { celebration, celebrate } = useCelebration(pixel);
 
   function onGoal(player: Player, delta: 1 | -1) {
     const current = state.live.score;
@@ -47,6 +50,7 @@ export function App() {
     const next = { ...current, [player]: current[player] + delta };
     const quitou = delta > 0 ? quitadaOf(next, state.rules) : null;
     if (pixel) blip(delta > 0 ? "goal" : "undo");
+    if (delta > 0) celebrate(player, quitou ? "quitada" : "goal");
     if (voiceOn) {
       if (delta > 0) roar(quitou ? 4.5 : 3);
       say(
@@ -64,6 +68,8 @@ export function App() {
     const finished = board.finishMatch();
     if (!finished) return;
     if (pixel) blip("whistle");
+    const winner = outcomeOf(finished.match.score);
+    if (winner !== "draw") celebrate(winner, "win");
     if (voiceOn) {
       const day = groupByDay(finished.matches).find(
         (d) => d.key === dayKeyOf(finished.match.playedAt),
@@ -95,7 +101,9 @@ export function App() {
 
   return (
     <div className="pr-[max(16px,env(safe-area-inset-right))] pl-[max(16px,env(safe-area-inset-left))] pt-5 pb-10">
-      <main className="ui-device mx-auto flex max-w-180 flex-col gap-6">
+      <main
+        className={`ui-device mx-auto flex max-w-180 flex-col gap-6 ${celebration ? "is-celebrating" : ""} ${celebration?.kind === "quitada" ? "is-quitada" : ""}`}
+      >
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
             <span className="font-label text-[13px] tracking-[0.14em] text-muted uppercase">
@@ -179,6 +187,7 @@ export function App() {
           </footer>
         )}
       </main>
+      <GoalFlash celebration={celebration} />
     </div>
   );
 }

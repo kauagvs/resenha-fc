@@ -14,6 +14,10 @@ Projeto pessoal, feito por diversão.
 - **Narração:** grito de gol de narrador ("Gooool! Gol, gol, gol! É do Kauã! 2 a 1 para o
   Kauã.") com rugido de torcida, gol anulado e fim de jogo com a situação do dia. Liga e
   desliga no botão **Narração**.
+- **Comemoração:** a cada gol a tela treme, os botões pulam, sobem fogos de artifício na cor de
+  quem marcou e um "GOL!" gigante estoura no meio da tela ("QUITOU!" com fogos dobrados na
+  quitada, "VENCEU!" ao encerrar). No 8-bit os fogos são de pixel. Quem usa "reduzir
+  movimento" no aparelho não vê as animações.
 - **Regra da quitada:** abriu 3 gols de diferença (3×0, 4×1...), a partida acaba: os gols
   travam, aparece o selo **QUITADA!** e a narração anuncia. Liga e desliga no próprio placar;
   a escolha vale para os dois aparelhos. Com a regra ligada, o histórico marca as partidas
@@ -54,6 +58,8 @@ src/
   lib/blip.ts            bipes 8-bit (Web Audio)
   lib/voice.ts           narração por voz (Web Speech API)
   lib/crowd.ts           rugido de torcida (Web Audio)
+  lib/fireworks.ts       fogos de artifício (canvas)
+  hooks/useCelebration.ts tremida, pulo dos botões e "GOL!" gigante
   hooks/useVoice.ts      liga/desliga a narração
   components/            Scoreboard, SeriesSummary, MatchHistory, ConfirmButton
   App.tsx
