@@ -5,7 +5,7 @@ import { PLAYERS } from "../domain/match";
 const pct = (n: number, total: number) => (total ? `${(n / total) * 100}%` : "0%");
 
 export function SeriesSummary({ stats }: { stats: SeriesStats }) {
-  const { played, wins, draws, goals, biggestWin, streak, days } = stats;
+  const { played, wins, draws, goals, biggestWin, streak, days, quitadas } = stats;
 
   const facts: ReactNode[] = [];
   if (played) {
@@ -17,6 +17,13 @@ export function SeriesSummary({ stats }: { stats: SeriesStats }) {
         Média por jogo <b>{((goals.felipe + goals.kaua) / played).toFixed(1).replace(".", ",")}</b>
       </>,
     );
+    if (quitadas.felipe + quitadas.kaua > 0) {
+      facts.push(
+        <>
+          Quitadas: Felipe <b>{quitadas.felipe}</b> · Kauã <b>{quitadas.kaua}</b>
+        </>,
+      );
+    }
     if (biggestWin) {
       const { felipe, kaua } = biggestWin.score;
       facts.push(

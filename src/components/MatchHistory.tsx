@@ -1,5 +1,5 @@
-import type { Match } from "../domain/match";
-import { PLAYERS, dateOfDayKey, groupByDay, outcomeOf } from "../domain/match";
+import type { Match, Rules } from "../domain/match";
+import { PLAYERS, dateOfDayKey, groupByDay, outcomeOf, quitadaOf } from "../domain/match";
 import { ConfirmButton } from "./ConfirmButton";
 import { Heading } from "./SeriesSummary";
 
@@ -21,11 +21,12 @@ const PILL = {
 
 type Props = {
   matches: Match[];
+  rules: Rules;
   todayKey: string;
   onDelete: (id: string) => void;
 };
 
-export function MatchHistory({ matches, todayKey, onDelete }: Props) {
+export function MatchHistory({ matches, rules, todayKey, onDelete }: Props) {
   // Numeração cronológica de todas as partidas (#1 = primeira); dias do mais recente ao mais antigo.
   const numbers = new Map(
     [...matches]
@@ -72,6 +73,7 @@ export function MatchHistory({ matches, todayKey, onDelete }: Props) {
                   key={match.id}
                   match={match}
                   number={numbers.get(match.id) ?? 0}
+                  quitada={quitadaOf(match.score, rules) !== null}
                   onDelete={onDelete}
                 />
               ))}
@@ -86,10 +88,12 @@ export function MatchHistory({ matches, todayKey, onDelete }: Props) {
 function MatchRow({
   match,
   number,
+  quitada,
   onDelete,
 }: {
   match: Match;
   number: number;
+  quitada: boolean;
   onDelete: (id: string) => void;
 }) {
   const pill = PILL[outcomeOf(match.score)];
@@ -110,6 +114,13 @@ function MatchRow({
         >
           {pill.label}
         </span>
+        {quitada && (
+          <span
+            className={`${pill.className} ui-pill rounded-full bg-current/15 px-2 py-0.5 font-label text-xs font-semibold tracking-wider uppercase`}
+          >
+            Quitada
+          </span>
+        )}
         <span className="text-[13px] text-muted">
           {timeFmt.format(new Date(match.playedAt))}
           {clubs && ` · ${clubs}`}

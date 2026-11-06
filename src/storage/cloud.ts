@@ -1,7 +1,7 @@
-import type { LiveMatch, Match } from "../domain/match";
+import type { LiveMatch, Match, Rules } from "../domain/match";
 import { emptyLiveMatch } from "../domain/match";
 import type { StoredState } from "./matches";
-import { parseLive, parseMatch } from "./matches";
+import { initialState, parseLive, parseMatch, parseRules } from "./matches";
 import type { ScoreStore, StoreStatus } from "./store";
 
 /**
@@ -11,6 +11,7 @@ import type { ScoreStore, StoreStatus } from "./store";
  * Documentos:
  *   placar/atual     { score, clubs, updatedAt }   partida em andamento
  *   partidas/<id>    { score, clubs, playedAt }    partidas encerradas
+ *   config/regras    { quitada }                   regras combinadas
  * Também lê o formato da primeira versão da página ({ f, k } e { f, k, at }).
  */
 
@@ -50,8 +51,9 @@ export async function openCloudStore(): Promise<ScoreStore | null> {
 function createCloudStore(db: Db): ScoreStore {
   const liveRef = db.doc("placar/atual");
   const matchesCol = db.collection("partidas");
+  const rulesRef = db.doc("config/regras");
 
-  let state: StoredState = { live: emptyLiveMatch(), matches: [] };
+  let state: StoredState = initialState();
   let onState: (s: StoredState) => void = () => {};
   let onStatus: (s: StoreStatus) => void = () => {};
 
@@ -122,10 +124,17 @@ function createCloudStore(db: Db): ScoreStore {
         emit();
       }, lost);
 
+      const stopRules = rulesRef.onSnapshot((snap) => {
+        if (snap.metadata.hasPendingWrites) return;
+        state = { ...state, rules: parseRules(snap.exists ? snap.data() : undefined) };
+        emit();
+      }, lost);
+
       return () => {
         clearTimeout(timer);
         stopLive();
         stopMatches();
+        stopRules();
         onState = () => {};
         onStatus = () => {};
       };
@@ -142,6 +151,11 @@ function createCloudStore(db: Db): ScoreStore {
         .doc(match.id)
         .set({ score: match.score, clubs: match.clubs, playedAt: match.playedAt })
         .catch(failed);
+    },
+    setRules(rules: Rules) {
+      state = { ...state, rules };
+      emit();
+      rulesRef.set({ quitada: rules.quitada }).catch(failed);
     },
     deleteMatch(id: string) {
       matchesCol.doc(id).delete().catch(failed);

@@ -24,6 +24,21 @@ export type Match = {
 
 export type Outcome = Player | "draw";
 
+/** Regras combinadas entre os dois. */
+export type Rules = {
+  /** Quitada: abriu QUITADA_MARGIN gols de diferença, a partida acaba e quem abriu vence. */
+  quitada: boolean;
+};
+
+export const DEFAULT_RULES: Rules = { quitada: true };
+export const QUITADA_MARGIN = 3;
+
+/** Quem quitou a partida, ou `null` (sem quitada ou regra desligada). */
+export function quitadaOf(score: Score, rules: Rules): Player | null {
+  if (!rules.quitada || Math.abs(score.felipe - score.kaua) < QUITADA_MARGIN) return null;
+  return score.felipe > score.kaua ? "felipe" : "kaua";
+}
+
 export const emptyLiveMatch = (clubs: Clubs = { felipe: "", kaua: "" }): LiveMatch => ({
   score: { felipe: 0, kaua: 0 },
   clubs,
@@ -45,10 +60,12 @@ export type SeriesStats = {
   streak: { player: Player; count: number } | null;
   /** Quantos dias cada um venceu (e quantos terminaram empatados). */
   days: Record<Outcome, number>;
+  /** Quitadas aplicadas por cada um (zeradas com a regra desligada). */
+  quitadas: Record<Player, number>;
 };
 
 /** `matches` em qualquer ordem. */
-export function seriesStats(matches: Match[]): SeriesStats {
+export function seriesStats(matches: Match[], rules: Rules = DEFAULT_RULES): SeriesStats {
   const stats: SeriesStats = {
     played: matches.length,
     wins: { felipe: 0, kaua: 0 },
@@ -57,12 +74,15 @@ export function seriesStats(matches: Match[]): SeriesStats {
     biggestWin: null,
     streak: null,
     days: { felipe: 0, kaua: 0, draw: 0 },
+    quitadas: { felipe: 0, kaua: 0 },
   };
 
   for (const m of matches) {
     const outcome = outcomeOf(m.score);
     if (outcome === "draw") stats.draws++;
     else stats.wins[outcome]++;
+    const quitada = quitadaOf(m.score, rules);
+    if (quitada) stats.quitadas[quitada]++;
     stats.goals.felipe += m.score.felipe;
     stats.goals.kaua += m.score.kaua;
 

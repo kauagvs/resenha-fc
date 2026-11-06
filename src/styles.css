@@ -17,6 +17,17 @@
   --font-label: "Barlow Condensed", "Arial Narrow", sans-serif;
 
   --animate-bump: bump 0.35s ease-out;
+  --animate-stamp: stamp 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  @keyframes stamp {
+    0% {
+      transform: scale(2.4) rotate(-14deg);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1) rotate(-6deg);
+      opacity: 1;
+    }
+  }
   @keyframes bump {
     0% {
       transform: scale(1.18);
@@ -300,4 +311,21 @@ button {
 [data-skin="pixel"] .ui-day-head .font-display {
   font-size: 14px;
   font-weight: 400;
+}
+
+/* Quitada */
+.ui-quitada {
+  text-shadow: 0 0 22px currentColor;
+}
+[data-skin="pixel"] .ui-quitada {
+  font-size: 26px;
+  font-weight: 400;
+  text-shadow: 4px 4px 0 var(--px-ink);
+  animation: stamp 0.4s steps(4) both;
+}
+[data-skin="pixel"] .ui-rule-hint {
+  color: var(--color-muted);
+}
+[data-skin="pixel"] .ui-board .ui-toggle {
+  font-size: 9px;
 }

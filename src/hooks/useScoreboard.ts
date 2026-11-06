@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { LiveMatch, Match, Player } from "../domain/match";
+import type { LiveMatch, Match, Player, Rules } from "../domain/match";
 import { emptyLiveMatch, seriesStats } from "../domain/match";
 import type { StoredState } from "../storage/matches";
+import { initialState } from "../storage/matches";
 import type { ScoreStore, StoreStatus } from "../storage/store";
 import { openStore } from "../storage/store";
 
 export function useScoreboard() {
   const storeRef = useRef<ScoreStore | null>(null);
-  const [state, setState] = useState<StoredState>({ live: emptyLiveMatch(), matches: [] });
+  const [state, setState] = useState<StoredState>(initialState);
   const [status, setStatus] = useState<StoreStatus>("loading");
   const [kind, setKind] = useState<ScoreStore["kind"] | null>(null);
 
@@ -70,10 +71,15 @@ export function useScoreboard() {
 
   const deleteMatch = useCallback((id: string) => storeRef.current?.deleteMatch(id), []);
 
+  const setRules = useCallback((rules: Rules) => storeRef.current?.setRules(rules), []);
+
   /** Restaurar backup só existe no modo local; online os dados já ficam guardados. */
   const replaceAll = useCallback((next: StoredState) => storeRef.current?.replaceAll?.(next), []);
 
-  const stats = useMemo(() => seriesStats(state.matches), [state.matches]);
+  const stats = useMemo(
+    () => seriesStats(state.matches, state.rules),
+    [state.matches, state.rules],
+  );
 
   return {
     state,
@@ -85,6 +91,7 @@ export function useScoreboard() {
     resetScore,
     finishMatch,
     deleteMatch,
+    setRules,
     replaceAll,
   };
 }

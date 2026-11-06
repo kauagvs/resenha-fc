@@ -1,5 +1,5 @@
-import type { LiveMatch, Match } from "../domain/match";
-import { emptyLiveMatch } from "../domain/match";
+import type { LiveMatch, Match, Rules } from "../domain/match";
+import { DEFAULT_RULES, emptyLiveMatch } from "../domain/match";
 
 /** Persistência no navegador (localStorage), backup em JSON e leitura tolerante dos dados salvos. */
 
@@ -11,9 +11,14 @@ const BACKUP_IDS = ["resenha-fc", "placar-fifa"];
 export type StoredState = {
   live: LiveMatch;
   matches: Match[];
+  rules: Rules;
 };
 
-const initialState = (): StoredState => ({ live: emptyLiveMatch(), matches: [] });
+export const initialState = (): StoredState => ({
+  live: emptyLiveMatch(),
+  matches: [],
+  rules: DEFAULT_RULES,
+});
 
 export function loadState(): StoredState {
   try {
@@ -59,7 +64,12 @@ function parseState(json: unknown): StoredState {
   if (!isRecord(json)) return initialState();
   const matches = Array.isArray(json["matches"]) ? json["matches"].flatMap(parseMatch) : [];
   const live = parseLive(json["live"]);
-  return { live, matches };
+  return { live, matches, rules: parseRules(json["rules"]) };
+}
+
+export function parseRules(v: unknown): Rules {
+  const r = isRecord(v) ? v : {};
+  return { quitada: typeof r["quitada"] === "boolean" ? r["quitada"] : DEFAULT_RULES.quitada };
 }
 
 export function parseLive(v: unknown): LiveMatch {

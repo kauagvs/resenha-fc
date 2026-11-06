@@ -1,4 +1,4 @@
-import type { LiveMatch, Match } from "../domain/match";
+import type { LiveMatch, Match, Rules } from "../domain/match";
 import { openCloudStore } from "./cloud";
 import type { StoredState } from "./matches";
 import { loadState, saveState } from "./matches";
@@ -25,6 +25,7 @@ export type ScoreStore = {
   setLive(live: LiveMatch): void;
   addMatch(match: Match): void;
   deleteMatch(id: string): void;
+  setRules(rules: Rules): void;
   /** Só no modo local (restaurar backup). */
   replaceAll?(state: StoredState): void;
 };
@@ -60,6 +61,7 @@ export function createLocalStore(): ScoreStore {
     setLive: (live) => commit({ ...state, live }),
     addMatch: (match) => commit({ ...state, matches: [...state.matches, match] }),
     deleteMatch: (id) => commit({ ...state, matches: state.matches.filter((m) => m.id !== id) }),
+    setRules: (rules) => commit({ ...state, rules }),
     replaceAll: commit,
   };
 }

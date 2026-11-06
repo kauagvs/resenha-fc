@@ -1,6 +1,7 @@
-import type { LiveMatch, Player } from "../domain/match";
-import { PLAYERS } from "../domain/match";
+import type { LiveMatch, Player, Rules } from "../domain/match";
+import { PLAYERS, QUITADA_MARGIN } from "../domain/match";
 import { ConfirmButton } from "./ConfirmButton";
+import { Switch } from "./Switch";
 
 const SIDE = {
   felipe: { text: "text-felipe", bg: "bg-felipe" },
@@ -14,9 +15,24 @@ type Props = {
   onClub: (player: Player, club: string) => void;
   onFinish: () => void;
   onReset: () => void;
+  /** Quem quitou a partida em andamento; com quitada os gols travam até encerrar. */
+  quitada: Player | null;
+  rules: Rules;
+  onRules: (rules: Rules) => void;
 };
 
-export function Scoreboard({ live, matchNumber, onGoal, onClub, onFinish, onReset }: Props) {
+export function Scoreboard({
+  live,
+  matchNumber,
+  onGoal,
+  onClub,
+  onFinish,
+  onReset,
+  quitada,
+  rules,
+  onRules,
+}: Props) {
+  const locked = quitada !== null;
   return (
     <section
       aria-label="Placar da partida atual"
@@ -27,18 +43,32 @@ export function Scoreboard({ live, matchNumber, onGoal, onClub, onFinish, onRese
       </p>
 
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <Side player="felipe" live={live} onGoal={onGoal} onClub={onClub} />
+        <Side player="felipe" live={live} onGoal={onGoal} onClub={onClub} locked={locked} />
         <span aria-hidden className="ui-vs pb-16 font-display text-5xl text-line sm:text-6xl">
           ×
         </span>
-        <Side player="kaua" live={live} onGoal={onGoal} onClub={onClub} mirrored />
+        <Side player="kaua" live={live} onGoal={onGoal} onClub={onClub} locked={locked} mirrored />
       </div>
+
+      {quitada && (
+        <div role="status" className="mt-5 flex flex-col items-center gap-1 text-center">
+          <p
+            className={`${SIDE[quitada].text} ui-quitada animate-stamp font-display text-5xl font-black tracking-[0.04em] uppercase`}
+          >
+            Quitada!
+          </p>
+          <p className="text-sm text-muted">
+            {PLAYERS[quitada].name} abriu {QUITADA_MARGIN} de diferença. Toque em “Encerrar partida”
+            para registrar.
+          </p>
+        </div>
+      )}
 
       <div className="mt-5 flex flex-wrap justify-center gap-2.5">
         <button
           type="button"
           onClick={onFinish}
-          className="ui-btn rounded-[10px] bg-chalk px-5 py-3 font-label text-[15px] font-semibold tracking-[0.08em] text-night uppercase"
+          className="ui-btn ui-finish rounded-[10px] bg-chalk px-5 py-3 font-label text-[15px] font-semibold tracking-[0.08em] text-night uppercase"
         >
           Encerrar partida
         </button>
@@ -49,6 +79,19 @@ export function Scoreboard({ live, matchNumber, onGoal, onClub, onFinish, onRese
           className="ui-btn ui-btn-ghost rounded-[10px] border border-line px-5 py-3 font-label text-[15px] font-semibold tracking-[0.08em] text-muted uppercase"
         />
       </div>
+
+      <div className="mt-4 flex flex-col items-center gap-1">
+        <Switch
+          label={`Regra da quitada · ${QUITADA_MARGIN} gols`}
+          checked={rules.quitada}
+          onToggle={() => onRules({ ...rules, quitada: !rules.quitada })}
+        />
+        <p className="ui-rule-hint text-xs text-muted">
+          {rules.quitada
+            ? `Abriu ${QUITADA_MARGIN} gols de diferença, acabou a partida.`
+            : "Desligada: a partida só acaba quando vocês encerram."}
+        </p>
+      </div>
     </section>
   );
 }
@@ -58,12 +101,14 @@ function Side({
   live,
   onGoal,
   onClub,
+  locked,
   mirrored = false,
 }: {
   player: Player;
   live: LiveMatch;
   onGoal: Props["onGoal"];
   onClub: Props["onClub"];
+  locked: boolean;
   mirrored?: boolean;
 }) {
   const { name } = PLAYERS[player];
@@ -85,8 +130,9 @@ function Side({
     <button
       type="button"
       aria-label={`Gol do ${name}`}
+      disabled={locked}
       onClick={() => onGoal(player, 1)}
-      className={`${color.bg} ui-btn rounded-[10px] px-4 py-3 font-label text-base font-semibold tracking-[0.06em] text-night uppercase active:translate-y-px sm:px-5`}
+      className={`${color.bg} ui-btn rounded-[10px] px-4 py-3 font-label text-base font-semibold tracking-[0.06em] text-night uppercase active:translate-y-px disabled:cursor-default disabled:opacity-35 sm:px-5`}
     >
       Gol
     </button>

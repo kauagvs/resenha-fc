@@ -5,12 +5,13 @@ import { SeriesSummary } from "./components/SeriesSummary";
 import { Switch } from "./components/Switch";
 import { TodayPanel } from "./components/TodayPanel";
 import type { Player } from "./domain/match";
-import { dayKeyOf, groupByDay } from "./domain/match";
+import { dayKeyOf, groupByDay, quitadaOf } from "./domain/match";
 import { useScoreboard } from "./hooks/useScoreboard";
 import { useSkin } from "./hooks/useSkin";
 import { useVoice } from "./hooks/useVoice";
 import { blip } from "./lib/blip";
-import { finalCall, goalCall, say, undoCall } from "./lib/voice";
+import { roar } from "./lib/crowd";
+import { finalCall, goalCall, quitadaCall, say, undoCall } from "./lib/voice";
 import { exportBackup, parseBackup } from "./storage/matches";
 import type { StoreStatus } from "./storage/store";
 
@@ -37,13 +38,24 @@ export function App() {
     [state.matches, todayKey],
   );
 
+  const liveQuitada = quitadaOf(state.live.score, state.rules);
+
   function onGoal(player: Player, delta: 1 | -1) {
     const current = state.live.score;
     if (delta < 0 && current[player] === 0) return;
+    if (delta > 0 && liveQuitada) return;
+    const next = { ...current, [player]: current[player] + delta };
+    const quitou = delta > 0 ? quitadaOf(next, state.rules) : null;
     if (pixel) blip(delta > 0 ? "goal" : "undo");
     if (voiceOn) {
-      const next = { ...current, [player]: current[player] + delta };
-      say(delta > 0 ? goalCall(player, next) : undoCall());
+      if (delta > 0) roar(quitou ? 4.5 : 3);
+      say(
+        delta < 0
+          ? undoCall()
+          : quitou
+            ? [...goalCall(player, next).slice(0, 3), ...quitadaCall(quitou, next)]
+            : goalCall(player, next),
+      );
     }
     board.addGoal(player, delta);
   }
@@ -56,7 +68,7 @@ export function App() {
       const day = groupByDay(finished.matches).find(
         (d) => d.key === dayKeyOf(finished.match.playedAt),
       );
-      say(finalCall(finished.match.score, day));
+      say(finalCall(finished.match.score, day, quitadaOf(finished.match.score, state.rules)));
     }
   }
   const fileInput = useRef<HTMLInputElement>(null);
@@ -101,7 +113,7 @@ export function App() {
               label="Narração"
               checked={voiceOn}
               onToggle={() => {
-                if (!voiceOn) say("Narração ligada. Bola rolando!");
+                if (!voiceOn) say(["Narração ligada. Bola rolando!"]);
                 toggleVoice();
               }}
             />
@@ -123,13 +135,21 @@ export function App() {
           onClub={board.setClub}
           onFinish={onFinish}
           onReset={board.resetScore}
+          quitada={liveQuitada}
+          rules={state.rules}
+          onRules={board.setRules}
         />
 
         <TodayPanel todayKey={todayKey} day={today} />
 
         <SeriesSummary stats={board.stats} />
 
-        <MatchHistory matches={state.matches} todayKey={todayKey} onDelete={board.deleteMatch} />
+        <MatchHistory
+          matches={state.matches}
+          rules={state.rules}
+          todayKey={todayKey}
+          onDelete={board.deleteMatch}
+        />
 
         {board.kind === "local" && (
           <footer className="ui-footer flex flex-wrap items-center gap-3 text-sm text-muted">

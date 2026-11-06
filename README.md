@@ -11,8 +11,13 @@ Projeto pessoal, feito por diversão.
   "ganha o dia". O painel **Hoje** mostra quem está na frente, a série conta os **dias
   vencidos** e o histórico vem separado por dia. Partidas antes das 5h contam para o dia
   anterior, para uma resenha que vira a madrugada continuar sendo o mesmo dia.
-- **Narração:** a voz do aparelho fala o gol ("Gol do Kauã! 2 a 1 para o Kauã."), o gol
-  anulado e o fim de jogo com a situação do dia. Liga e desliga no botão **Narração**.
+- **Narração:** grito de gol de narrador ("Gooool! Gol, gol, gol! É do Kauã! 2 a 1 para o
+  Kauã.") com rugido de torcida, gol anulado e fim de jogo com a situação do dia. Liga e
+  desliga no botão **Narração**.
+- **Regra da quitada:** abriu 3 gols de diferença (3×0, 4×1...), a partida acaba: os gols
+  travam, aparece o selo **QUITADA!** e a narração anuncia. Liga e desliga no próprio placar;
+  a escolha vale para os dois aparelhos. Com a regra ligada, o histórico marca as partidas
+  quitadas e a série conta as quitadas de cada um.
 
 ## Modo 8-bit
 
@@ -48,6 +53,7 @@ src/
   hooks/useSkin.ts       liga/desliga o modo 8-bit
   lib/blip.ts            bipes 8-bit (Web Audio)
   lib/voice.ts           narração por voz (Web Speech API)
+  lib/crowd.ts           rugido de torcida (Web Audio)
   hooks/useVoice.ts      liga/desliga a narração
   components/            Scoreboard, SeriesSummary, MatchHistory, ConfirmButton
   App.tsx
